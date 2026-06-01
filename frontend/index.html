@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity RAG | Production Observability Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo-area">
+                <div class="logo-glow"></div>
+                <i data-lucide="shield-alert" class="logo-icon animate-pulse"></i>
+                <div class="logo-text">
+                    <h1>ANTIGRAVITY <span class="gradient-text">RAG</span></h1>
+                    <p class="subtitle">Production-Grade Retrieval-Augmented Generation</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="connection-status" id="backend-status">
+                    <span class="status-dot offline"></span>
+                    <span class="status-label">Connecting Backend...</span>
+                </div>
+                <button class="btn btn-secondary btn-icon" id="btn-reset" title="Reset Vector Store & Stats">
+                    <i data-lucide="rotate-ccw"></i>
+                    Reset
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace Layout -->
+        <main class="workspace-grid">
+            
+            <!-- Left Side: Ingestion & Vector DB -->
+            <section class="workspace-card panel-ingestion">
+                <div class="card-header">
+                    <i data-lucide="file-up" class="header-icon"></i>
+                    <h2>Document Ingestion</h2>
+                </div>
+                <p class="section-desc">Ingest raw documents here. They will be split using recursive semantic chunking and stored in Chroma vector store.</p>
+                
+                <!-- Drag and Drop Area -->
+                <div class="upload-dropzone" id="upload-zone">
+                    <input type="file" id="file-input" accept=".txt,.md,.pdf,.json" class="hidden-input">
+                    <i data-lucide="cloud-lightning" class="upload-icon"></i>
+                    <p class="upload-text">Drag & drop files here, or <span class="highlight">browse</span></p>
+                    <p class="upload-subtext">Supports TXT, MD, PDF, JSON up to 10MB</p>
+                </div>
+
+                <!-- Live Upload Status -->
+                <div class="ingested-list-wrapper">
+                    <h3>Ingested Documents</h3>
+                    <div class="ingested-list" id="ingested-list">
+                        <div class="empty-state">
+                            <i data-lucide="folder-open"></i>
+                            <p>No documents ingested yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: QA Interface -->
+            <section class="workspace-card panel-qa">
+                <div class="card-header">
+                    <i data-lucide="sparkles" class="header-icon"></i>
+                    <h2>Grounded Question & Answering</h2>
+                </div>
+                
+                <!-- QA Area -->
+                <div class="qa-container">
+                    <div class="chat-history" id="chat-history">
+                        <div class="system-welcome">
+                            <div class="welcome-icon"><i data-lucide="bot"></i></div>
+                            <h3>Welcome to Antigravity RAG</h3>
+                            <p>Once you ingest documents on the left, query the system here. The generation is strictly grounded in retrieved evidence with citation links.</p>
+                        </div>
+                    </div>
+                    
+                    <form class="input-form" id="query-form">
+                        <input type="text" id="query-input" placeholder="Ask a question about the ingested documents..." required disabled autocomplete="off">
+                        <button type="submit" class="btn btn-primary" id="btn-submit" disabled>
+                            <span>Query</span>
+                            <i data-lucide="send"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Bottom: Observability Dashboard -->
+            <section class="workspace-card panel-observability">
+                <div class="card-header header-full-width">
+                    <div class="header-left">
+                        <i data-lucide="line-chart" class="header-icon text-accent"></i>
+                        <h2>Comprehensive Observability Dashboard</h2>
+                    </div>
+                    <span class="badge badge-accent">Langfuse Instrument Active</span>
+                </div>
+                
+                <div class="metrics-grid">
+                    <!-- Metric Card 1: Latency P50/P95 -->
+                    <div class="metric-card">
+                        <div class="metric-info">
+                            <span class="metric-label">Latency (P50 / P95)</span>
+                            <i data-lucide="gauge" class="metric-icon"></i>
+                        </div>
+                        <div class="metric-value">
+                            <span id="stat-p50">0.00</span>s <span class="divider">/</span> <span class="sub-val" id="stat-p95">0.00</span>s
+                        </div>
+                        <div class="metric-progress-bar">
+                            <div class="progress-fill" style="width: 35%"></div>
+                        </div>
+                        <p class="metric-footer">Target p95 latency: &lt; 2.5s</p>
+                    </div>
+
+                    <!-- Metric Card 2: Cost Per Request -->
+                    <div class="metric-card">
+                        <div class="metric-info">
+                            <span class="metric-label">Avg Cost / Request</span>
+                            <i data-lucide="coins" class="metric-icon"></i>
+                        </div>
+                        <div class="metric-value">
+                            $<span id="stat-cost">0.000000</span>
+                        </div>
+                        <div class="metric-progress-bar">
+                            <div class="progress-fill" style="width: 15%"></div>
+                        </div>
+                        <p class="metric-footer">Based on input & output token rates</p>
+                    </div>
+
+                    <!-- Metric Card 3: Citation Coverage -->
+                    <div class="metric-card">
+                        <div class="metric-info">
+                            <span class="metric-label">Citation Groundedness</span>
+                            <i data-lucide="bookmark-check" class="metric-icon"></i>
+                        </div>
+                        <div class="metric-value">
+                            <span id="stat-citation">0.0</span>%
+                        </div>
+                        <div class="metric-progress-bar">
+                            <div class="progress-fill" id="progress-citation" style="width: 0%"></div>
+                        </div>
+                        <p class="metric-footer">Percentage of grounded claims</p>
+                    </div>
+
+                    <!-- Metric Card 4: Failure Rate -->
+                    <div class="metric-card">
+                        <div class="metric-info">
+                            <span class="metric-label">Failure Rate</span>
+                            <i data-lucide="shield-alert" class="metric-icon"></i>
+                        </div>
+                        <div class="metric-value text-success" id="stat-failure-container">
+                            <span id="stat-failure">0.0</span>%
+                        </div>
+                        <div class="metric-progress-bar">
+                            <div class="progress-fill bg-success" style="width: 0%"></div>
+                        </div>
+                        <p class="metric-footer" id="stat-requests-summary">0 total requests processed</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Citation Modal/Sidebar details -->
+    <div class="modal" id="citation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Source Citation Detail</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="meta-row">
+                    <span class="meta-badge" id="modal-source-badge">source.txt</span>
+                    <span class="meta-badge" id="modal-score-badge">Relevance: 98%</span>
+                </div>
+                <div class="citation-text-block">
+                    <p id="modal-citation-text">Retrieved text content goes here...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
