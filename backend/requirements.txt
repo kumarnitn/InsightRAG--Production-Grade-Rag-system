@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+python-dotenv
+langchain
+langchain-community
+langchain-chroma
+chromadb
+langfuse
+google-generativeai
+langchain-google-genai
+tiktoken
+numpy==1.26.4
+pypdf
