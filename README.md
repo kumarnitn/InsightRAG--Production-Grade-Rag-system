@@ -1,99 +1,480 @@
-<div align="center">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/RAG-Production_Grade-FF6B6B?style=for-the-badge" alt="RAG" />
-  <img src="https://img.shields.io/badge/ChromaDB-Data-blue?style=for-the-badge" alt="ChromaDB" />
-</div>
+# Enterprise RAG Platform
 
-<h1 align="center">Production Grade RAG System 🚀</h1>
-
-<p align="center">
-  <b>A high-performance, observable Retrieval-Augmented Generation (RAG) system with a premium glassmorphic dashboard.</b><br>
-  <i>Track real-time latency (p50/p95), cost-per-request, failure rates, and citation groundedness seamlessly.</i>
-</p>
+A Production-Grade Retrieval-Augmented Generation (RAG) Platform designed to ingest enterprise documents, perform intelligent retrieval, generate citation-backed answers, and continuously monitor quality through observability and evaluation frameworks.
 
 ---
 
-## ✨ Features
+## Overview
 
-- **End-to-End RAG Pipeline**: Robust ingestion, chunking, and semantic retrieval.
-- **Real-Time Observability**: Built-in tracking for API latency, LLM cost estimation, and query success rates.
-- **Citation Grounding**: Every answer provides precise, clickable citations mapped directly to source documents.
-- **Premium UI/UX**: Stunning glassmorphic frontend built for an immersive user experience.
-- **Extensive Testing**: Comprehensive PyUnit and assertion-based validation suites.
+This project demonstrates how modern enterprise AI systems are built beyond a simple chatbot.
 
-## 🛠️ Technology Stack
+The platform enables users to:
 
-- **Backend**: FastAPI, Python
-- **Database**: ChromaDB (Vector Store)
-- **Frontend**: Vanilla HTML/CSS/JS (Glassmorphic Design)
-- **Observability**: Langfuse Logging & Groundedness Metrics
-- **Testing**: PyUnit
+* Upload PDFs and other enterprise documents
+* Parse and process documents
+* Generate embeddings
+* Store vectors in a vector database
+* Retrieve relevant information using semantic search
+* Improve retrieval quality using reranking
+* Generate grounded responses with citations
+* Monitor performance, cost, and quality
+* Evaluate retrieval and generation performance continuously
 
-## 📂 Project Structure
+---
+
+## System Architecture
 
 ```text
-├── backend/
-│   ├── app/
-│   │   ├── config.py         # Environmental configurations
-│   │   ├── database.py       # Chroma client & custom embedding function
-│   │   ├── ingestion.py      # Manual recursive chunk splitter
-│   │   ├── retrieval.py      # Top-K semantic similarity search
-│   │   ├── generation.py     # Prompt engineering & cost estimations
-│   │   ├── observability.py  # Langfuse logging & groundedness scores
-│   │   └── main.py           # FastAPI REST API endpoints
-│   └── requirements.txt      # Python dependencies
-├── frontend/
-│   ├── index.html            # Premium dashboard structure
-│   ├── style.css             # Glassmorphic glowing stylesheet
-│   └── index.js              # State logic & asynchronous request handler
-├── tests/
-│   ├── verify_rag.py         # PyUnit test suite
-│   └── verify_assert.py      # Assertion-based validation suite
-└── docs/
-    ├── ARCHITECTURE.md       # High-level architecture specification
-    ├── API_SPEC.md           # API endpoints & JSON body schemas
-    └── ROADMAP.md            # Product roadmap & feature progression
+                 ┌────────────────────┐
+                 │  User Upload PDF   │
+                 └─────────┬──────────┘
+                           │
+                           ▼
+                ┌──────────────────────┐
+                │ Document Processing  │
+                │ OCR / Parsing        │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ Chunking Pipeline    │
+                │ Metadata Extraction  │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ Embedding Model      │
+                └─────────┬────────────┘
+                          │
+                          ▼
+         ┌─────────────────────────────────┐
+         │ Vector Database                 │
+         │ Qdrant / Weaviate / Chroma      │
+         └────────────────┬────────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ Retriever            │
+                │ Top-K Search         │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ Reranker             │
+                │ Cross Encoder        │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ Context Builder      │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ LLM Generation       │
+                │ Citations            │
+                └─────────┬────────────┘
+                          │
+                          ▼
+                ┌──────────────────────┐
+                │ Langfuse             │
+                │ Monitoring           │
+                │ Evaluation           │
+                └──────────────────────┘
 ```
-
-## 🚀 Quickstart Guide
-
-### 1. Configure Environment Variables
-Create a `.env` file under the `backend/` directory and add your API keys:
-
-```bash
-GEMINI_API_KEY="your-gemini-api-key"
-LANGFUSE_PUBLIC_KEY="pk-lf-..."
-LANGFUSE_SECRET_KEY="sk-lf-..."
-```
-
-### 2. Launch Backend Service
-Activate your Python virtual environment and start the FastAPI server:
-
-```bash
-cd rag-project
-.venv/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### 3. Open the UI Client
-Simply open `frontend/index.html` in your web browser. 
-- **Drop Zone**: Upload and ingest your documents (`.pdf`, `.txt`, `.md`, `.json`).
-- **Query Box**: Ask context-aware questions.
-- **Inline References**: Click on highlighted citations (e.g., `[1]`) to review the exact source passages in a popup.
-- **Observability Panel**: Monitor real-time aggregated metrics continuously updated with every query execution.
-
-### 4. Run Verification Suite
-Validate the entire pipeline end-to-end (ingestion → chunking → retrieval → citation generation → evaluation metrics) with a single command:
-
-```bash
-.venv/bin/python tests/verify_assert.py
-```
-
-## 📈 Roadmap & Architecture
-For deep-dives into the system's design and upcoming features, check the `/docs` directory:
-- [System Architecture](docs/ARCHITECTURE.md)
-- [API Specifications](docs/API_SPEC.md)
-- [Future Roadmap](docs/ROADMAP.md)
 
 ---
-<p align="center"><i>Crafted for high performance and reliability.</i></p>
+
+# Key Features
+
+## Document Ingestion
+
+Supported formats:
+
+* PDF
+* DOCX
+* TXT
+* PPTX
+* CSV
+* Markdown
+
+Capabilities:
+
+* OCR Support
+* Metadata Extraction
+* Document Parsing
+* Section Detection
+
+---
+
+## Semantic Chunking
+
+The platform uses intelligent chunking instead of fixed-size splitting.
+
+Features:
+
+* Heading-aware chunking
+* Section-based chunking
+* Metadata preservation
+* Page-level tracking
+
+Example Metadata:
+
+```json
+{
+  "document_id": "123",
+  "page": 12,
+  "section": "Access Control",
+  "chunk_id": "chunk_45"
+}
+```
+
+---
+
+## Embedding Pipeline
+
+Documents are transformed into vector representations using modern embedding models.
+
+Supported Models:
+
+* OpenAI text-embedding-3-large
+* Jina Embeddings v3
+* BGE Embeddings
+
+---
+
+## Vector Database
+
+Supported Databases:
+
+### Development
+
+* Chroma
+
+### Production
+
+* Qdrant
+* Weaviate
+
+Stored Information:
+
+* Embeddings
+* Metadata
+* Source References
+* Page Numbers
+
+---
+
+## Hybrid Retrieval
+
+The retrieval layer combines:
+
+```text
+BM25 Search
++
+Vector Similarity Search
+```
+
+Benefits:
+
+* Better recall
+* Better precision
+* Keyword matching
+* Semantic understanding
+
+---
+
+## Reranking
+
+Retrieved chunks are reranked using cross-encoder models.
+
+Supported Models:
+
+* BGE Reranker
+* Cohere Rerank
+
+Pipeline:
+
+```text
+Top 20 Chunks
+      ↓
+Cross Encoder
+      ↓
+Top 5 Chunks
+```
+
+---
+
+## Citation-Aware Generation
+
+Answers are generated only from retrieved evidence.
+
+Every response includes:
+
+* Source document
+* Page number
+* Supporting chunk
+
+Example:
+
+```text
+Remote work is allowed three days per week.
+
+Source:
+Employee_Handbook.pdf
+Page 12
+```
+
+---
+
+## Observability with Langfuse
+
+Every request is traced end-to-end.
+
+Trace Flow:
+
+```text
+User Query
+     ↓
+Retriever
+     ↓
+Reranker
+     ↓
+Prompt Builder
+     ↓
+LLM
+     ↓
+Response
+```
+
+Tracked Metrics:
+
+* Token Usage
+* Cost Per Request
+* Latency
+* Retrieved Chunks
+* Prompt Versions
+* User Feedback
+
+---
+
+## Evaluation Framework
+
+The platform continuously measures quality using:
+
+* RAGAS
+* DeepEval
+* Langfuse Evaluations
+
+Metrics:
+
+* Faithfulness
+* Answer Relevance
+* Context Precision
+* Context Recall
+* Citation Coverage
+
+---
+
+## Regression Testing
+
+Every deployment is validated against benchmark datasets.
+
+Deployment is blocked if:
+
+```text
+Faithfulness < 0.90
+
+Citation Coverage < 0.95
+
+P95 Latency > 5 seconds
+
+Hallucination Rate > 1%
+```
+
+---
+
+# Technology Stack
+
+## Backend
+
+* Python 3.12
+* FastAPI
+* Pydantic
+
+## Frontend
+
+* React
+* Next.js
+* Tailwind CSS
+
+## Retrieval
+
+* LangChain
+* LangGraph
+
+## Vector Databases
+
+* Qdrant
+* Weaviate
+* Chroma
+
+## Embeddings
+
+* OpenAI Embeddings
+* Jina Embeddings
+* BGE Embeddings
+
+## LLMs
+
+* GPT-4.1
+* Claude Sonnet
+* Gemini 2.5 Pro
+* Open Source Models
+
+## Observability
+
+* Langfuse
+* OpenTelemetry
+* Prometheus
+* Grafana
+
+## Evaluation
+
+* RAGAS
+* DeepEval
+
+## Infrastructure
+
+* Docker
+* Kubernetes
+* GitHub Actions
+
+---
+
+# Repository Structure
+
+```text
+rag-project/
+│
+├── docs/
+│   ├── IMPLEMENTATION_PLAN.md
+│   ├── ARCHITECTURE.md
+│   ├── API_SPEC.md
+│   ├── ROADMAP.md
+│   └── TASKS.md
+│
+├── frontend/
+│
+├── gateway/
+│
+├── ingestion-service/
+│
+├── retrieval-service/
+│
+├── generation-service/
+│
+├── evaluation-service/
+│
+├── shared/
+│
+├── infra/
+│
+└── .agent/
+    ├── rules/
+    └── skills/
+```
+
+---
+
+# Development Roadmap
+
+### Phase 1
+
+* Project Setup
+* API Gateway
+* Authentication
+
+### Phase 2
+
+* Document Upload
+* Parsing
+* Chunking
+
+### Phase 3
+
+* Embeddings
+* Vector Database
+
+### Phase 4
+
+* Retrieval
+* Hybrid Search
+* Reranking
+
+### Phase 5
+
+* Generation
+* Citations
+
+### Phase 6
+
+* Langfuse Integration
+* Monitoring
+
+### Phase 7
+
+* Evaluation Framework
+* Regression Gates
+
+### Phase 8
+
+* Docker
+* Kubernetes
+* Production Deployment
+
+---
+
+# Production Goals
+
+Target Metrics:
+
+| Metric             | Target |
+| ------------------ | ------ |
+| Faithfulness       | > 90%  |
+| Citation Coverage  | > 95%  |
+| Hallucination Rate | < 1%   |
+| P95 Latency        | < 5s   |
+| Retrieval Hit Rate | > 90%  |
+
+---
+
+# Future Enhancements
+
+* Multi-Agent Architecture
+* Graph RAG
+* Knowledge Graph Integration
+* Human Feedback Loops
+* Multi-Modal Retrieval
+* Advanced Analytics Dashboard
+
+---
+
+# Why This Project?
+
+Most RAG projects stop at:
+
+```text
+PDF → Embeddings → Chatbot
+```
+
+This project goes beyond that by implementing:
+
+* Production Retrieval Architecture
+* Observability
+* Evaluation
+* Monitoring
+* Regression Testing
+* Enterprise Deployment Patterns
+
+making it representative of real-world AI systems used in modern organizations.
